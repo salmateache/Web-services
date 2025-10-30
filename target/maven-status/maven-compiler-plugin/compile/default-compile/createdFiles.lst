@@ -1,0 +1,7 @@
+entities\Note.class
+entities\Professeur.class
+com\mycompany\edutrack\Edutrack.class
+entities\Role.class
+entities\Authentification.class
+entities\Etudiant.class
+entities\Module.class
