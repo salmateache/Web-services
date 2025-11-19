@@ -1,21 +1,25 @@
 import React from "react";
-import { Routes, Route, Link } from "react-router-dom";
-import AddStudent from "./pages/AddStudent";
+import { Routes, Route } from "react-router-dom";
+import DashboardLayout from "./components/DashboardLayout";
+
+// Importez vos pages ici
 import StudentsPage from "./pages/StudentsPage";
+// import AddStudent from "./pages/AddStudent"; // Décommentez quand vous avez créé ce fichier
 
 const App: React.FC = () => {
   return (
-    <div className="p-4">
-      <nav className="mb-4">
-        <Link className="mr-4" to="/">Étudiants</Link>
-        <Link to="/add-student">Ajouter étudiant</Link>
-      </nav>
-
+    <DashboardLayout>
       <Routes>
+        {/* Route par défaut (/) affiche la liste des étudiants */}
         <Route path="/" element={<StudentsPage />} />
-        <Route path="/add-student" element={<AddStudent />} />
+        
+        {/* Route dashboard (si différente) */}
+        <Route path="/dashboard" element={<StudentsPage />} />
+        
+        {/* Route pour ajouter un étudiant */}
+        {/* <Route path="/add-student" element={<AddStudent />} /> */}
       </Routes>
-    </div>
+    </DashboardLayout>
   );
 };
 

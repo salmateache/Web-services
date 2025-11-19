@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Card, CardContent } from "@/components/ui/card";
+import { Card, CardContent } from "../components/SimpleCard";
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer } from "recharts";
 import { motion } from "framer-motion";
 
@@ -11,7 +11,7 @@ interface Student {
   email: string;
 }
 
-export default function StudentsDashboard() {
+export default function StudentsPage() {
   const [students, setStudents] = useState<Student[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -22,44 +22,48 @@ export default function StudentsDashboard() {
         setStudents(data);
         setLoading(false);
       })
-      .catch(() => setLoading(false));
+      .catch((err) => {
+        console.error("Erreur fetch:", err);
+        setLoading(false);
+      });
   }, []);
 
-  if (loading) return <div className="p-6 text-xl">Chargement...</div>;
+  if (loading) return <div className="p-6 text-xl">Chargement des données...</div>;
 
   const chartData = [
-    { name: "Étudiants", count: students.length },
+    { name: "Total Étudiants", count: students.length },
   ];
 
   return (
-    <div className="p-6 grid grid-cols-12 gap-6">
+    <div className="grid grid-cols-12 gap-6">
+      {/* --- Liste des étudiants --- */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         className="col-span-12 lg:col-span-8 space-y-6"
       >
-        <Card className="rounded-2xl shadow-lg">
+        <Card className="rounded-2xl shadow-sm border border-gray-200 bg-white">
           <CardContent className="p-6">
-            <h2 className="text-2xl font-bold mb-4">Liste des étudiants</h2>
+            <h2 className="text-2xl font-bold mb-4 text-gray-800">Liste des étudiants</h2>
             <div className="overflow-x-auto">
               <table className="w-full text-left border-collapse">
-                <thead className="bg-gray-100">
+                <thead className="bg-gray-50 text-gray-600 uppercase text-sm">
                   <tr>
-                    <th className="px-4 py-2">ID</th>
-                    <th className="px-4 py-2">Nom</th>
-                    <th className="px-4 py-2">Prénom</th>
-                    <th className="px-4 py-2">Matricule</th>
-                    <th className="px-4 py-2">Email</th>
+                    <th className="px-4 py-3 rounded-tl-lg">ID</th>
+                    <th className="px-4 py-3">Nom</th>
+                    <th className="px-4 py-3">Prénom</th>
+                    <th className="px-4 py-3">Matricule</th>
+                    <th className="px-4 py-3 rounded-tr-lg">Email</th>
                   </tr>
                 </thead>
-                <tbody>
+                <tbody className="divide-y divide-gray-100">
                   {students.map((s) => (
-                    <tr key={s.id} className="border-b hover:bg-gray-50 transition">
-                      <td className="px-4 py-2">{s.id}</td>
-                      <td className="px-4 py-2">{s.nom}</td>
-                      <td className="px-4 py-2">{s.prenom}</td>
-                      <td className="px-4 py-2">{s.matricule}</td>
-                      <td className="px-4 py-2">{s.email}</td>
+                    <tr key={s.id} className="hover:bg-blue-50/50 transition">
+                      <td className="px-4 py-3 text-gray-600">{s.id}</td>
+                      <td className="px-4 py-3 font-medium text-gray-900">{s.nom}</td>
+                      <td className="px-4 py-3 text-gray-700">{s.prenom}</td>
+                      <td className="px-4 py-3 text-gray-500">{s.matricule}</td>
+                      <td className="px-4 py-3 text-blue-600">{s.email}</td>
                     </tr>
                   ))}
                 </tbody>
@@ -69,37 +73,26 @@ export default function StudentsDashboard() {
         </Card>
       </motion.div>
 
+      {/* --- Statistiques --- */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.1 }}
         className="col-span-12 lg:col-span-4 space-y-6"
       >
-        <Card className="rounded-2xl shadow-lg">
+        <Card className="rounded-2xl shadow-sm border border-gray-200 bg-white">
           <CardContent className="p-6">
-            <h3 className="text-lg font-semibold mb-3">Statistiques</h3>
+            <h3 className="text-lg font-semibold mb-3 text-gray-800">Statistiques</h3>
             <div className="h-48">
               <ResponsiveContainer width="100%" height="100%">
                 <BarChart data={chartData}>
-                  <XAxis dataKey="name" />
+                  <XAxis dataKey="name" tick={{fontSize: 12}} />
                   <YAxis />
-                  <Tooltip />
-                  <Bar dataKey="count" />
+                  <Tooltip cursor={{fill: '#f3f4f6'}} />
+                  <Bar dataKey="count" fill="#3b82f6" radius={[4, 4, 0, 0]} barSize={50} />
                 </BarChart>
               </ResponsiveContainer>
             </div>
-          </CardContent>
-        </Card>
-
-        <Card className="rounded-2xl shadow-lg">
-          <CardContent className="p-6">
-            <h3 className="text-lg font-semibold mb-3">Derniers inscrits</h3>
-            <ul className="space-y-2">
-              {students.slice(-3).map((s) => (
-                <li key={s.id} className="text-gray-700 font-medium">
-                  {s.nom} {s.prenom} — {s.matricule}
-                </li>
-              ))}
-            </ul>
           </CardContent>
         </Card>
       </motion.div>
