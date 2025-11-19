@@ -1,0 +1,4 @@
+com\edutrack\professor\model\Professor.class
+com\edutrack\professor\controller\ProfessorController.class
+com\edutrack\professor\repository\ProfessorRepository.class
+com\edutrack\professor\ProfessorServiceApplication.class

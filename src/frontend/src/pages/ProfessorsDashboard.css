@@ -1,0 +1,82 @@
+/* src/frontend/src/ProfessorsDashboard.css */
+
+.dashboard-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    padding: 20px;
+    background-color: #f3f4f6;
+    /* Gris très clair */
+    min-height: 100vh;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.card {
+    background: white;
+    border-radius: 12px;
+    padding: 20px;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    border: 1px solid #e5e7eb;
+}
+
+h2,
+h3 {
+    margin-top: 0;
+    color: #111827;
+    margin-bottom: 15px;
+}
+
+
+/* Tableaux */
+
+.table-container {
+    overflow-x: auto;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.95rem;
+}
+
+thead tr {
+    background-color: #f9fafb;
+    text-align: left;
+}
+
+th {
+    padding: 12px;
+    font-weight: 600;
+    color: #4b5563;
+    border-bottom: 2px solid #e5e7eb;
+}
+
+td {
+    padding: 12px;
+    color: #374151;
+    border-bottom: 1px solid #f3f4f6;
+}
+
+tr:hover {
+    background-color: #f9fafb;
+}
+
+
+/* Listes */
+
+ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+li {
+    padding: 10px 0;
+    border-bottom: 1px solid #eee;
+    display: flex;
+    flex-direction: column;
+}
+
+li:last-child {
+    border-bottom: none;
+}
