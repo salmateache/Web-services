@@ -1,48 +1,66 @@
-import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import React from "react";
 
-const AddStudent: React.FC = () => {
-  const [nom, setNom] = useState("");
-  const [prenom, setPrenom] = useState("");
-  const [matricule, setMatricule] = useState("");
-  const [email, setEmail] = useState("");
-  const navigate = useNavigate();
+interface Props {
+  nom: string;
+  prenom: string;
+  matricule: string;
+  email: string;
+  setNom: (v: string) => void;
+  setPrenom: (v: string) => void;
+  setMatricule: (v: string) => void;
+  setEmail: (v: string) => void;
+  handleSubmit: (e: React.FormEvent) => void;
+}
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    const student = { nom, prenom, matricule, email };
+const StudentForm: React.FC<Props> = ({
+  nom,
+  prenom,
+  matricule,
+  email,
+  setNom,
+  setPrenom,
+  setMatricule,
+  setEmail,
+  handleSubmit
+}) => (
+  <form onSubmit={handleSubmit} className="bg-beige-100 p-6 rounded-2xl shadow-md space-y-4 max-w-md mx-auto">
+    <h2 className="text-2xl font-bold text-blue-700 text-center mb-4">Ajouter un étudiant</h2>
+    <input
+      placeholder="Nom"
+      value={nom}
+      onChange={e => setNom(e.target.value)}
+      required
+      className="w-full p-3 rounded-lg border border-blue-300 focus:outline-none focus:ring-2 focus:ring-blue-200"
+    />
+    <input
+      placeholder="Prénom"
+      value={prenom}
+      onChange={e => setPrenom(e.target.value)}
+      required
+      className="w-full p-3 rounded-lg border border-blue-300 focus:outline-none focus:ring-2 focus:ring-blue-200"
+    />
+    <input
+      placeholder="Matricule"
+      value={matricule}
+      onChange={e => setMatricule(e.target.value)}
+      required
+      className="w-full p-3 rounded-lg border border-blue-300 focus:outline-none focus:ring-2 focus:ring-blue-200"
+    />
+    <input
+      placeholder="Email"
+      value={email}
+      onChange={e => setEmail(e.target.value)}
+      required
+      type="email"
+      className="w-full p-3 rounded-lg border border-blue-300 focus:outline-none focus:ring-2 focus:ring-blue-200"
+    />
+    <button
+      type="submit"
+      className="w-full py-3 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition"
+    >
+      Ajouter
+    </button>
+  </form>
+);
 
-    try {
-      const res = await fetch("http://localhost:8082/api/students", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(student)
-      });
-
-      if (res.ok) {
-        alert("Étudiant ajouté !");
-        navigate("/");
-      } else {
-        alert("Erreur lors de l'ajout");
-      }
-    } catch (err) {
-      console.error(err);
-      alert("Erreur réseau");
-    }
-  };
-
-  return (
-    <div>
-      <h2>Ajouter un étudiant</h2>
-      <form onSubmit={handleSubmit}>
-        <input placeholder="Nom" value={nom} onChange={e => setNom(e.target.value)} required />
-        <input placeholder="Prénom" value={prenom} onChange={e => setPrenom(e.target.value)} required />
-        <input placeholder="Matricule" value={matricule} onChange={e => setMatricule(e.target.value)} required />
-        <input placeholder="Email" value={email} onChange={e => setEmail(e.target.value)} required />
-        <button type="submit">Ajouter</button>
-      </form>
-    </div>
-  );
-};
-
-export default AddStudent;
+export default StudentForm;
