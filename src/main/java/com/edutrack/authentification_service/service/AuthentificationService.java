@@ -1,48 +1,66 @@
 package com.edutrack.authentification_service.service;
 
-import com.edutrack.authentification_service.entity.Utilisateur;
-import com.edutrack.authentification_service.repository.UtilisateurRepository;
-import com.edutrack.authentification_service.security.JwtTokenProvider;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.util.Optional;
-
+import com.edutrack.authentification_service.entity.Utilisateur;
+import com.edutrack.authentification_service.repository.UtilisateurRepository;
+import com.edutrack.authentification_service.security.JwtTokenProvider;
 
 @Service
 public class AuthentificationService {
 
-    @Autowired private UtilisateurRepository utilisateurRepository;
-    @Autowired private PasswordEncoder passwordEncoder;
-    @Autowired private JwtTokenProvider jwtTokenProvider;
+    @Autowired
+    private UtilisateurRepository utilisateurRepository;
 
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+
+    @Autowired
+    private JwtTokenProvider jwtTokenProvider;
+
+    /**
+     * Inscription d'un nouvel utilisateur
+     */
     public String signup(String username, String password, String role) {
+        // Vérification si l'utilisateur existe déjà
         if (utilisateurRepository.existsByUsername(username)) {
-            return "Nom d'utilisateur déjà utilisé.";
+            throw new RuntimeException("Erreur: Nom d'utilisateur déjà pris !");
         }
 
-        Utilisateur utilisateur = Utilisateur.builder()
+        // Création de l'utilisateur avec mot de passe crypté
+        Utilisateur user = Utilisateur.builder()
                 .username(username)
                 .password(passwordEncoder.encode(password))
                 .role(role)
                 .build();
 
-        utilisateurRepository.save(utilisateur);
-        return "Utilisateur créé avec succès.";
+        utilisateurRepository.save(user);
+        return "Utilisateur enregistré avec succès";
     }
 
+    /**
+     * Connexion d'un utilisateur
+     * @return Le Token JWT si les identifiants sont corrects
+     */
     public String login(String username, String password) {
-        Optional<Utilisateur> userOpt = utilisateurRepository.findByUsername(username);
-        if (userOpt.isPresent()) {
-            Utilisateur user = userOpt.get();
-            if (passwordEncoder.matches(password, user.getPassword())) {
-                return "Login réussi " ;
-            }
+        // 1. Chercher l'utilisateur dans la BDD
+        Utilisateur user = utilisateurRepository.findByUsername(username)
+                .orElseThrow(() -> new RuntimeException("Utilisateur non trouvé"));
+
+        // 2. Vérifier si le mot de passe correspond (comparaison du hash)
+        if (!passwordEncoder.matches(password, user.getPassword())) {
+            throw new RuntimeException("Mot de passe incorrect");
         }
-        return "Identifiants incorrects.";
+
+        // 3. Générer et retourner le Token JWT
+        return jwtTokenProvider.generateToken(user.getUsername(), user.getRole());
     }
 
+    /**
+     * Vérification de la validité d'un token
+     */
     public boolean verifyToken(String token) {
         return jwtTokenProvider.validateToken(token);
     }

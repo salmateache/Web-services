@@ -1,10 +1,16 @@
 package com.edutrack.authentification_service.controller;
 
+import com.edutrack.authentification_service.dto.LoginRequest;
+import com.edutrack.authentification_service.dto.SignupRequest;
 import com.edutrack.authentification_service.service.AuthentificationService;
+import com.edutrack.authentification_service.security.JwtTokenProvider;
+
+import io.jsonwebtoken.Claims;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Map;
 
 @RestController
 @RequestMapping("/auth")
@@ -14,17 +20,30 @@ public class AuthController {
     @Autowired
     private AuthentificationService authService;
 
+    @Autowired
+    private JwtTokenProvider jwtTokenProvider;
+
     @PostMapping("/signup")
-    public ResponseEntity<String> signup(@RequestParam String username,
-                                         @RequestParam String password,
-                                         @RequestParam String role) {
-        return ResponseEntity.ok(authService.signup(username, password, role));
+    public ResponseEntity<String> signup(@RequestBody SignupRequest request) {
+        return ResponseEntity.ok(
+                authService.signup(request.getUsername(), request.getPassword(), request.getRole())
+        );
     }
 
     @PostMapping("/login")
-    public ResponseEntity<String> login(@RequestParam String username,
-                                        @RequestParam String password) {
-        return ResponseEntity.ok(authService.login(username, password));
+    public ResponseEntity<Map<String, String>> login(@RequestBody LoginRequest request) {
+        // 1. Génération du token
+        String token = authService.login(request.getUsername(), request.getPassword());
+
+        // 2. Récupération du rôle depuis le token
+        Claims claims = jwtTokenProvider.getClaims(token);
+        String role = claims.get("role", String.class);
+
+        // 3. Retourner le token + rôle
+        return ResponseEntity.ok(Map.of(
+                "token", token,
+                "role", role
+        ));
     }
 
     @GetMapping("/verify")
