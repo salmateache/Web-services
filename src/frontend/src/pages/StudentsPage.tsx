@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { Card, CardContent } from "../components/ui/card";
-import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer } from "recharts";
+import { Trash2, Edit } from "lucide-react";
 import { motion } from "framer-motion";
+import AddStudent from "./AddStudent"; // formulaire
 
 interface Student {
   id: number;
@@ -14,16 +15,28 @@ interface Student {
 export default function StudentsPage() {
   const [students, setStudents] = useState<Student[]>([]);
   const [loading, setLoading] = useState(true);
+  const [studentToEdit, setStudentToEdit] = useState<Student | null>(null);
 
-  useEffect(() => {
+  const loadStudents = () => {
+    setLoading(true);
     fetch("http://localhost:8082/api/students")
       .then(res => res.json())
-      .then(data => {
-        setStudents(data);
-        setLoading(false);
-      })
+      .then(data => { setStudents(data); setLoading(false); })
       .catch(() => setLoading(false));
-  }, []);
+  };
+
+  useEffect(() => { loadStudents(); }, []);
+
+  const deleteStudent = async (id: number) => {
+    if (!window.confirm("Voulez-vous vraiment supprimer cet étudiant ?")) return;
+    try {
+      const res = await fetch(`http://localhost:8082/api/students/${id}`, { method: "DELETE" });
+      if (res.ok) loadStudents();
+      else alert("Erreur lors de la suppression !");
+    } catch { alert("Erreur réseau !"); }
+  };
+
+  const handleEdit = (student: Student) => { setStudentToEdit(student); };
 
   if (loading) return <div className="p-6 text-xl text-blue-700">Chargement...</div>;
 
@@ -31,6 +44,21 @@ export default function StudentsPage() {
 
   return (
     <div className="p-6 grid grid-cols-12 gap-6 bg-beige-50 min-h-screen">
+      
+      {/* Formulaire édition ou ajout */}
+      {studentToEdit && (
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="col-span-12"
+        >
+          <AddStudent
+            studentToEdit={studentToEdit}
+            onSaved={() => { setStudentToEdit(null); loadStudents(); }}
+          />
+        </motion.div>
+      )}
+
       {/* Tableau étudiants */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
@@ -49,6 +77,7 @@ export default function StudentsPage() {
                     <th className="px-4 py-2 text-blue-900">Prénom</th>
                     <th className="px-4 py-2 text-blue-900">Matricule</th>
                     <th className="px-4 py-2 text-blue-900">Email</th>
+                    <th className="px-4 py-2 text-blue-900">Actions</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -59,6 +88,22 @@ export default function StudentsPage() {
                       <td className="px-4 py-2">{s.prenom}</td>
                       <td className="px-4 py-2">{s.matricule}</td>
                       <td className="px-4 py-2">{s.email}</td>
+                      <td className="px-4 py-2 flex space-x-2">
+                        <button
+                          onClick={() => handleEdit(s)}
+                          className="text-blue-500 hover:text-blue-700"
+                          title="Modifier"
+                        >
+                          <Edit size={20} />
+                        </button>
+                        <button
+                          onClick={() => deleteStudent(s.id)}
+                          className="text-red-500 hover:text-red-700"
+                          title="Supprimer"
+                        >
+                          <Trash2 size={20} />
+                        </button>
+                      </td>
                     </tr>
                   ))}
                 </tbody>
@@ -78,14 +123,7 @@ export default function StudentsPage() {
           <CardContent className="p-6">
             <h3 className="text-lg font-semibold mb-3 text-blue-700">Statistiques</h3>
             <div className="h-48">
-              <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={chartData}>
-                  <XAxis dataKey="name" stroke="#1D4ED8" />
-                  <YAxis />
-                  <Tooltip />
-                  <Bar dataKey="count" fill="#1D4ED8" />
-                </BarChart>
-              </ResponsiveContainer>
+              {/* Ici tu peux ajouter un BarChart comme avant si tu veux */}
             </div>
           </CardContent>
         </Card>
