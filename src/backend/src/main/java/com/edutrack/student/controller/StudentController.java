@@ -2,10 +2,12 @@ package com.edutrack.student.controller;
 
 import com.edutrack.student.model.Student;
 import com.edutrack.student.repository.StudentRepository;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
+import org.springframework.http.HttpStatus;
 
 import java.util.List;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/students")
@@ -18,16 +20,37 @@ public class StudentController {
         this.repository = repository;
     }
 
+    // Rechercher un étudiant par ID ou matricule
+    @GetMapping("/search/{term}")
+    public ResponseEntity<Student> getStudentByIdOrMatricule(@PathVariable String term) {
+        try {
+            Student student;
+            if (term.matches("\\d+")) {
+                student = repository.findById(Long.parseLong(term))
+                        .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Étudiant non trouvé"));
+            } else {
+                student = repository.findByMatricule(term)
+                        .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Étudiant non trouvé"));
+            }
+            return ResponseEntity.ok(student);
+        } catch (NumberFormatException e) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "ID invalide");
+        }
+    }
+
+    // Récupérer tous les étudiants
     @GetMapping
     public List<Student> getAllStudents() {
         return repository.findAll();
     }
 
+    // Ajouter un étudiant
     @PostMapping
     public Student addStudent(@RequestBody Student student) {
         return repository.save(student);
     }
 
+    // Mettre à jour un étudiant
     @PutMapping("/{id}")
     public Student updateStudent(@PathVariable Long id, @RequestBody Student newStudent) {
         return repository.findById(id)
@@ -44,8 +67,13 @@ public class StudentController {
                 });
     }
 
+    // Supprimer un étudiant
     @DeleteMapping("/{id}")
-    public void deleteStudent(@PathVariable Long id) {
+    public ResponseEntity<Void> deleteStudent(@PathVariable Long id) {
+        if (!repository.existsById(id)) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Étudiant non trouvé");
+        }
         repository.deleteById(id);
+        return ResponseEntity.noContent().build();
     }
 }
