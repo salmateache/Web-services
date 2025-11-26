@@ -1,21 +1,20 @@
-import React from "react";
-import { Routes, Route } from "react-router-dom";
-import DashboardLayout from "./components/DashboardLayout";
+// Fichier : frontend/src/App.tsx
+import { Routes, Route } from "react-router-dom"; // SANS BrowserRouter
 import ProfessorsDashboard from "./pages/ProfessorsDashboard";
-import AddProfessor from "./pages/AddProfessor"; // 1. Import de la nouvelle page
+import AddProfessor from "./pages/AddProfessor";
+import EditProfessor from "./pages/EditProfessor"; 
+import DashboardLayout from "./components/DashboardLayout"; 
 
-const App: React.FC = () => {
+function App() {
   return (
     <DashboardLayout>
       <Routes>
-        {/* Route par défaut : Tableau de bord */}
         <Route path="/" element={<ProfessorsDashboard />} />
-        
-        {/* 2. Nouvelle route pour le formulaire d'ajout */}
-        <Route path="/add-professor" element={<AddProfessor />} />
+        <Route path="/professors/add" element={<AddProfessor />} />
+        <Route path="/professors/edit/:id" element={<EditProfessor />} />
       </Routes>
     </DashboardLayout>
   );
-};
+}
 
 export default App;
