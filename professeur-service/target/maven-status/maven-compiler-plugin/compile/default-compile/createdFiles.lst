@@ -1,9 +1,0 @@
-com\edutrack\professor\model\Professor.class
-com\edutrack\professor\security\TokenValidationFilter.class
-com\edutrack\professor\Config\WebClientConfig.class
-com\edutrack\professor\repository\ProfessorRepository.class
-com\edutrack\professor\service\ProfesseurServiceImpl.class
-com\edutrack\professor\service\ProfesseurService.class
-com\edutrack\professor\controller\ProfessorController.class
-com\edutrack\professor\security\SecurityConfig.class
-com\edutrack\professor\ProfessorServiceApplication.class
