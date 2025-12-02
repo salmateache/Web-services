@@ -1,5 +1,6 @@
 package com.edutrack.authentification_service.controller;
 
+import com.edutrack.authentification_service.dto.ChangePasswordRequest;
 import com.edutrack.authentification_service.dto.LoginRequest;
 import com.edutrack.authentification_service.dto.SignupRequest;
 import com.edutrack.authentification_service.service.AuthentificationService;
@@ -14,7 +15,6 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/auth")
-@CrossOrigin(origins = "*")
 public class AuthController {
 
     @Autowired
@@ -50,4 +50,15 @@ public class AuthController {
     public ResponseEntity<Boolean> verify(@RequestParam String token) {
         return ResponseEntity.ok(authService.verifyToken(token));
     }
+    // AJOUTER CECI DANS LA CLASSE AuthController
+
+@PostMapping("/change-password")
+public ResponseEntity<?> changePassword(@RequestBody ChangePasswordRequest request) {
+    try {
+        authService.changePassword(request.getUsername(), request.getOldPassword(), request.getNewPassword());
+        return ResponseEntity.ok(Map.of("message", "Mot de passe modifié avec succès"));
+    } catch (RuntimeException e) {
+        return ResponseEntity.badRequest().body(Map.of("message", e.getMessage()));
+    }
+}
 }

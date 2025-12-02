@@ -64,4 +64,20 @@ public class AuthentificationService {
     public boolean verifyToken(String token) {
         return jwtTokenProvider.validateToken(token);
     }
+    // AJOUTER CECI DANS LA CLASSE AuthentificationService
+
+public void changePassword(String username, String oldPassword, String newPassword) {
+    // 1. Chercher l'utilisateur
+    Utilisateur user = utilisateurRepository.findByUsername(username)
+            .orElseThrow(() -> new RuntimeException("Utilisateur non trouvé"));
+
+    // 2. Vérifier l'ancien mot de passe
+    if (!passwordEncoder.matches(oldPassword, user.getPassword())) {
+        throw new RuntimeException("Ancien mot de passe incorrect");
+    }
+
+    // 3. Sauvegarder le nouveau
+    user.setPassword(passwordEncoder.encode(newPassword));
+    utilisateurRepository.save(user);
+}
 }
