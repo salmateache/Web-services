@@ -1,7 +1,6 @@
-// src/pages/ProfessorsDashboard.tsx
 import React, { useEffect, useState, useCallback } from "react";
 import { Link } from "react-router-dom";
-import { Edit, Trash2, Plus, AlertCircle, Loader2 } from "lucide-react";
+import { Edit, Trash2, Plus, AlertCircle, Loader2, Search } from "lucide-react";
 import { professorService } from '../services/professorService';
 import AddProfessor from "./AddProfessor";
 
@@ -16,6 +15,7 @@ interface Professor {
 
 export default function ProfessorsDashboard() {
     const [professors, setProfessors] = useState<Professor[]>([]);
+    const [searchTerm, setSearchTerm] = useState("");
     const [loading, setLoading] = useState<boolean>(true);
     const [error, setError] = useState<string | null>(null);
     const [showAddModal, setShowAddModal] = useState(false);
@@ -41,12 +41,18 @@ export default function ProfessorsDashboard() {
         if (!window.confirm("Êtes-vous sûr de vouloir supprimer ce professeur ?")) return;
         try {
             await professorService.deleteProfessor(id);
-            // rafraîchir la liste
             fetchData();
         } catch (err: any) {
             alert(err.message || "Erreur lors de la suppression.");
         }
     };
+
+    // Filtrage
+    const filteredProfessors = professors.filter(p => 
+        p.nom.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        p.prenom.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        p.specialite.toLowerCase().includes(searchTerm.toLowerCase())
+    );
 
     if (loading) return (
         <div className="flex justify-center p-8"><Loader2 className="animate-spin text-blue-600" size={32}/></div>
@@ -61,16 +67,27 @@ export default function ProfessorsDashboard() {
 
     return (
         <div className="p-0 font-sans bg-gray-50">
-            <div className="flex justify-between items-center mb-6">
+            <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
                 <div>
                     <h1 className="text-2xl font-bold text-gray-800">Liste des Professeurs</h1>
-                    <p className="text-gray-500">Gérer les professeurs : ajouter, modifier ou supprimer.</p>
+                    <p className="text-gray-500 text-sm mt-1">{filteredProfessors.length} professeurs trouvés</p>
                 </div>
 
-                <div className="flex items-center gap-3">
+                <div className="flex flex-col sm:flex-row gap-3 w-full md:w-auto">
+                    <div className="relative">
+                        <Search className="absolute left-3 top-2.5 text-gray-400" size={20} />
+                        <input 
+                            type="text" 
+                            placeholder="Rechercher par nom..." 
+                            value={searchTerm}
+                            onChange={(e) => setSearchTerm(e.target.value)}
+                            className="pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none w-full sm:w-64"
+                        />
+                    </div>
+
                     <button
                        onClick={() => setShowAddModal(true)}
-                       className="flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700"
+                       className="flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 whitespace-nowrap"
                     >
                         <Plus size={18} /> Ajouter
                     </button>
@@ -90,8 +107,10 @@ export default function ProfessorsDashboard() {
             )}
 
             <div className="overflow-x-auto">
-                {professors.length === 0 ? (
-                    <p className="text-gray-500 italic p-4 bg-white rounded shadow">Aucun professeur trouvé. Ajoutez-en un!</p>
+                {filteredProfessors.length === 0 ? (
+                    <div className="text-center p-10 bg-white rounded-xl shadow-sm border border-gray-200">
+                        <p className="text-gray-500 italic">Aucun professeur ne correspond à votre recherche.</p>
+                    </div>
                 ) : (
                     <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
                         <table className="w-full text-left">
@@ -106,7 +125,7 @@ export default function ProfessorsDashboard() {
                                 </tr>
                             </thead>
                             <tbody className="divide-y divide-gray-100">
-                                {professors.map((p) => (
+                                {filteredProfessors.map((p) => (
                                     <tr key={p.id} className="hover:bg-gray-50 transition">
                                         <td className="p-4 text-gray-600">#{p.id}</td>
                                         <td className="p-4 font-medium text-gray-900">{p.nom} {p.prenom}</td>

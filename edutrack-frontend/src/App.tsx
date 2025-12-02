@@ -1,8 +1,10 @@
-// src/App.tsx
 import React from "react";
 import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
 import type { ReactNode } from "react";
 import { jwtDecode } from "jwt-decode";
+
+// Services
+import { authService } from "./services/authService";
 
 // Pages auth
 import LoginPage from "./pages/LoginPage";
@@ -11,19 +13,24 @@ import SignupPage from "./pages/SignupPage";
 // Layout
 import DashboardLayout from "./components/DashboardLayout";
 
-// Pages Etudiant / Professeur / Admin
+// Pages Communes
+import ProfilePage from "./pages/ProfilePage";
+
+// --- PAGES ADMIN ---
 import StudentsPage from "./pages/StudentsPage";
 import AdminPage from "./pages/AdminPage";
-import ProfesseurPage from "./pages/ProfesseurPage";
-
-// Pages Professeurs (Admin)
 import ProfessorsDashboard from "./pages/ProfessorsDashboard";
 import EditProfessor from "./pages/EditProfessor";
-
-// 📌 Pages Students (Admin) — AJOUTÉES
 import StudentsDashboard from "./pages/StudentsDashboard";
 import AddStudent from "./pages/AddStudent";
 import EditStudent from "./pages/EditStudent";
+import ModuleList from "./components/modules/ModuleList"; 
+import Bulletin from "./components/notes/Bulletin";
+
+// --- PAGES PROFESSEUR (Les imports cruciaux) ---
+import ProfesseurPage from "./pages/ProfesseurPage";
+import MyModules from "./pages/MyModules";       
+import ModuleNotes from "./pages/ModuleNotes";   
 
 interface DecodedToken {
   role: string;
@@ -68,11 +75,23 @@ const App: React.FC = () => {
     <Router>
       <Routes>
 
-        {/* AUTH */}
+        {/* --- AUTH --- */}
         <Route path="/login" element={<LoginPage />} />
         <Route path="/signup" element={<SignupPage />} />
 
-        {/* ======================= ETUDIANT ======================= */}
+        {/* --- PROFIL (Tous) --- */}
+        <Route
+          path="/profile"
+          element={
+            <ProtectedRoute role=""> 
+              <DashboardLayout role={authService.getCurrentUser()?.role}>
+                <ProfilePage />
+              </DashboardLayout>
+            </ProtectedRoute>
+          }
+        />
+
+        {/* --- ESPACE ÉTUDIANT --- */}
         <Route
           path="/etudiant"
           element={
@@ -84,7 +103,7 @@ const App: React.FC = () => {
           }
         />
 
-        {/* ======================= PROFESSEUR ======================= */}
+        {/* --- ESPACE PROFESSEUR --- */}
         <Route
           path="/professeur"
           element={
@@ -96,7 +115,31 @@ const App: React.FC = () => {
           }
         />
 
-        {/* ======================= ADMIN ======================= */}
+        {/* Route: Liste des modules du prof */}
+        <Route 
+          path="/professeur/modules" 
+          element={
+            <ProtectedRoute role="PROFESSEUR">
+              <DashboardLayout role="PROFESSEUR">
+                <MyModules />
+              </DashboardLayout>
+            </ProtectedRoute>
+          } 
+        />
+
+        {/* Route: Saisie des notes (IdModule dynamique) */}
+        <Route 
+          path="/professeur/modules/:idModule/notes" 
+          element={
+            <ProtectedRoute role="PROFESSEUR">
+              <DashboardLayout role="PROFESSEUR">
+                <ModuleNotes />
+              </DashboardLayout>
+            </ProtectedRoute>
+          } 
+        />
+
+        {/* --- ESPACE ADMIN --- */}
         <Route
           path="/admin"
           element={
@@ -108,66 +151,18 @@ const App: React.FC = () => {
           }
         />
 
-        {/* ADMIN -> PROFESSEURS */}
-        <Route
-          path="/admin/professors"
-          element={
-            <ProtectedRoute role="ADMINISTRATEUR">
-              <DashboardLayout role="ADMINISTRATEUR">
-                <ProfessorsDashboard />
-              </DashboardLayout>
-            </ProtectedRoute>
-          }
-        />
+        {/* Admin: Gestion Profs */}
+        <Route path="/admin/professors" element={<ProtectedRoute role="ADMINISTRATEUR"><DashboardLayout role="ADMINISTRATEUR"><ProfessorsDashboard /></DashboardLayout></ProtectedRoute>} />
+        <Route path="/admin/professors/edit/:id" element={<ProtectedRoute role="ADMINISTRATEUR"><DashboardLayout role="ADMINISTRATEUR"><EditProfessor /></DashboardLayout></ProtectedRoute>} />
+        
+        {/* Admin: Gestion Étudiants */}
+        <Route path="/admin/students" element={<ProtectedRoute role="ADMINISTRATEUR"><DashboardLayout role="ADMINISTRATEUR"><StudentsDashboard /></DashboardLayout></ProtectedRoute>} />
+        <Route path="/admin/students/add" element={<ProtectedRoute role="ADMINISTRATEUR"><DashboardLayout role="ADMINISTRATEUR"><AddStudent /></DashboardLayout></ProtectedRoute>} />
+        <Route path="/admin/students/edit/:id" element={<ProtectedRoute role="ADMINISTRATEUR"><DashboardLayout role="ADMINISTRATEUR"><EditStudent /></DashboardLayout></ProtectedRoute>} />
 
-        <Route
-          path="/admin/professors/edit/:id"
-          element={
-            <ProtectedRoute role="ADMINISTRATEUR">
-              <DashboardLayout role="ADMINISTRATEUR">
-                <EditProfessor />
-              </DashboardLayout>
-            </ProtectedRoute>
-          }
-        />
-
-        {/* ======================= ADMIN -> STUDENTS (AJOUTÉ) ======================= */}
-
-        {/* Liste des étudiants */}
-        <Route
-          path="/admin/students"
-          element={
-            <ProtectedRoute role="ADMINISTRATEUR">
-              <DashboardLayout role="ADMINISTRATEUR">
-                <StudentsDashboard />
-              </DashboardLayout>
-            </ProtectedRoute>
-          }
-        />
-
-        {/* Ajouter un étudiant */}
-        <Route
-          path="/admin/students/add"
-          element={
-            <ProtectedRoute role="ADMINISTRATEUR">
-              <DashboardLayout role="ADMINISTRATEUR">
-                <AddStudent />
-              </DashboardLayout>
-            </ProtectedRoute>
-          }
-        />
-
-        {/* Modifier un étudiant */}
-        <Route
-          path="/admin/students/edit/:id"
-          element={
-            <ProtectedRoute role="ADMINISTRATEUR">
-              <DashboardLayout role="ADMINISTRATEUR">
-                <EditStudent />
-              </DashboardLayout>
-            </ProtectedRoute>
-          }
-        />
+        {/* Admin: Gestion Modules & Bulletins */}
+        <Route path="/admin/modules" element={<ProtectedRoute role="ADMINISTRATEUR"><DashboardLayout role="ADMINISTRATEUR"><ModuleList /></DashboardLayout></ProtectedRoute>} />
+        <Route path="/admin/bulletin" element={<ProtectedRoute role="ADMINISTRATEUR"><DashboardLayout role="ADMINISTRATEUR"><Bulletin /></DashboardLayout></ProtectedRoute>} />
 
         {/* DEFAULT */}
         <Route path="/" element={<Navigate to="/login" />} />

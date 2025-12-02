@@ -105,4 +105,11 @@ public class StudentController {
         workbook.write(response.getOutputStream());
         workbook.close();
     }
+    // ... tes autres méthodes existantes ...
+
+ @GetMapping("/search")
+    public List<Student> searchStudents(@RequestParam String nom) {
+        // On passe la même chaîne de recherche aux 3 champs
+        return repository.findByNomContainingIgnoreCaseOrPrenomContainingIgnoreCaseOrMatriculeContainingIgnoreCase(nom, nom, nom);
+    }
 }

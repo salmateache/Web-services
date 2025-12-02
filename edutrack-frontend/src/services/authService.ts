@@ -1,8 +1,14 @@
+import { jwtDecode } from "jwt-decode";
+
 const API_URL = "http://localhost:8081/auth";
 
-export const authService = {
+interface DecodedToken {
+  sub: string; // Le username (matricule ou email)
+  role: string;
+  exp: number;
+}
 
-  // LOGIN : CORRIGÉ POUR LIRE LE JSON
+export const authService = {
   login: async (username: string, password: string) => {
     try {
       const response = await fetch(`${API_URL}/login`, {
@@ -12,7 +18,6 @@ export const authService = {
       });
 
       if (!response.ok) {
-        // On tente de lire le message d'erreur JSON, sinon texte
         try {
             const errJson = await response.json();
             throw new Error(errJson.message || "Identifiants incorrects");
@@ -21,10 +26,7 @@ export const authService = {
         }
       }
 
-      // IMPORTANT : Le backend renvoie du JSON { token: "...", role: "..." }
       const data = await response.json();
-      
-      // On stocke le token brut
       localStorage.setItem("token", data.token);
       return data.token;
     } catch (error) {
@@ -32,7 +34,6 @@ export const authService = {
     }
   },
 
-  // SIGNUP
   signup: async (username: string, password: string, role: string) => {
     try {
       const response = await fetch(`${API_URL}/signup`, {
@@ -45,11 +46,35 @@ export const authService = {
         const msg = await response.text();
         throw new Error(msg || "Erreur lors de l'inscription");
       }
-
       return await response.text();
     } catch (error) {
       throw error;
     }
+  },
+
+  // --- NOUVELLE MÉTHODE CHANGE PASSWORD ---
+  changePassword: async (oldPassword: string, newPassword: string) => {
+    const token = localStorage.getItem("token");
+    if (!token) throw new Error("Non connecté");
+
+    // On récupère le username depuis le token pour savoir QUI change son mot de passe
+    const decoded: any = jwtDecode(token);
+    const username = decoded.sub;
+
+    const response = await fetch(`${API_URL}/change-password`, {
+      method: "POST",
+      headers: { 
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${token}`
+      },
+      body: JSON.stringify({ username, oldPassword, newPassword }),
+    });
+
+    if (!response.ok) {
+        const err = await response.json();
+        throw new Error(err.message || "Erreur lors du changement de mot de passe");
+    }
+    return await response.json();
   },
 
   logout: () => {
@@ -63,5 +88,20 @@ export const authService = {
 
   getToken: () => {
     return localStorage.getItem("token");
+  },
+
+  getCurrentUser: () => {
+    const token = localStorage.getItem("token");
+    if (!token) return null;
+
+    try {
+      const decoded: DecodedToken = jwtDecode(token);
+      return {
+        username: decoded.sub,
+        role: decoded.role
+      };
+    } catch (error) {
+      return null;
+    }
   }
 };

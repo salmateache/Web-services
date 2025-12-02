@@ -3,7 +3,6 @@ package com.edutrack.professor.service;
 import com.edutrack.professor.model.Professor;
 import com.edutrack.professor.repository.ProfessorRepository;
 import org.springframework.stereotype.Service;
-import org.springframework.web.reactive.function.client.WebClient; 
 import java.util.List;
 import java.util.NoSuchElementException;
 
@@ -11,11 +10,10 @@ import java.util.NoSuchElementException;
 public class ProfesseurServiceImpl implements ProfesseurService {
 
     private final ProfessorRepository repository;
-    private final WebClient.Builder webClientBuilder; 
 
-    public ProfesseurServiceImpl(ProfessorRepository repository, WebClient.Builder webClientBuilder) {
+    // On a supprimé WebClient car on n'appelle plus le service Module d'ici
+    public ProfesseurServiceImpl(ProfessorRepository repository) {
         this.repository = repository;
-        this.webClientBuilder = webClientBuilder; 
     }
 
     private Professor findByIdOrThrow(Long id) {
@@ -24,7 +22,9 @@ public class ProfesseurServiceImpl implements ProfesseurService {
     }
 
     @Override
-    public Professor addProfesseur(Professor professeur) { return repository.save(professeur); }
+    public Professor addProfesseur(Professor professeur) { 
+        return repository.save(professeur); 
+    }
 
     @Override
     public Professor updateProfesseur(Long id, Professor professeurDetails) {
@@ -40,19 +40,21 @@ public class ProfesseurServiceImpl implements ProfesseurService {
     }
 
     @Override
-    public void deleteProfesseur(Long id) { findByIdOrThrow(id); repository.deleteById(id); }
-
-    @Override
-    public Professor getProfesseurById(Long id) { return findByIdOrThrow(id); }
-
-    @Override
-    public List<Professor> getProfesseurs() { return repository.findAll(); }
-
-    @Override
-    public Professor assignModule(Long idProf, Long idModule) {
-        // Logique métier: Appel WebClient au Service Modules pour validation
-        Professor p = findByIdOrThrow(idProf);
-        p.setModuleId(idModule); 
-        return repository.save(p);
+    public void deleteProfesseur(Long id) { 
+        findByIdOrThrow(id); 
+        repository.deleteById(id); 
     }
+
+    @Override
+    public Professor getProfesseurById(Long id) { 
+        return findByIdOrThrow(id); 
+    }
+
+    @Override
+    public List<Professor> getProfesseurs() { 
+        return repository.findAll(); 
+    }
+
+    // ❌ LA MÉTHODE assignModule A ÉTÉ SUPPRIMÉE ICI
+    // Car la relation est gérée par le microservice "Module" maintenant.
 }

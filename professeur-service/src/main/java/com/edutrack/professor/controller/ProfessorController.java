@@ -4,61 +4,47 @@ import com.edutrack.professor.model.Professor;
 import com.edutrack.professor.service.ProfesseurService; 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import java.util.List; // 🚨 AJOUT CRITIQUE POUR COMPILATION
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/professors") 
-// Assurez-vous que le port est bien 5173
-@CrossOrigin(origins = "http://localhost:5173") 
+@CrossOrigin(origins = "http://localhost:5173") // Autorise React
 public class ProfessorController {
 
     private final ProfesseurService service; 
 
-    // Injection par constructeur
     public ProfessorController(ProfesseurService service) {
         this.service = service;
     }
 
-    // --- FONCTIONNALITÉS CRUD ET MÉTIER ---
-
-    // 1. POST (Ajout) : /api/professors
+    // 1. Ajouter un prof
     @PostMapping
     public Professor add(@RequestBody Professor professeur) {
         return service.addProfesseur(professeur);
     }
 
-    // 2. GET (Liste complète) : /api/professors
+    // 2. Liste des profs
     @GetMapping
     public List<Professor> list() {
         return service.getProfesseurs();
     }
     
-    // 3. GET (Par ID) : /api/professors/{id}
+    // 3. Prof par ID (C'est CELUI-CI qui est vital pour ModuleList.jsx)
     @GetMapping("/{id}")
     public Professor getById(@PathVariable Long id) {
         return service.getProfesseurById(id);
     }
 
-    // 4. PUT (Modification) : /api/professors/{id}
+    // 4. Mettre à jour
     @PutMapping("/{id}") 
     public Professor update(@PathVariable Long id, @RequestBody Professor professeur) {
         return service.updateProfesseur(id, professeur);
     }
 
-    // 5. DELETE (Suppression) : /api/professors/{id}
+    // 5. Supprimer
     @DeleteMapping("/{id}") 
     public ResponseEntity<String> delete(@PathVariable Long id) {
         service.deleteProfesseur(id);
-        // 🚨 CORRECTION : Ajout du retour ResponseEntity
         return ResponseEntity.ok("Professeur supprimé avec succès."); 
     }
-
-    // 6. POST (Fonction métier : Assigner Module) : /api/professors/{idProf}/assign/{idModule}
-    // Cette méthode a été ajoutée dans la section précédente.
-    /*
-    @PostMapping("/{idProf}/assign/{idModule}") 
-    public Professor assignModule(@PathVariable Long idProf, @PathVariable Long idModule) {
-        return service.assignModule(idProf, idModule);
-    }
-    */
 }

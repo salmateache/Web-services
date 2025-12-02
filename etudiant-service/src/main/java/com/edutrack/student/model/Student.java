@@ -12,6 +12,11 @@ public class Student {
     private String matricule;
     private String email;
 
+    // --- NOUVEAUX CHAMPS ---
+    private String filiere;
+    private String niveau;       // Ex: Licence, Master
+    private Integer semestreActuel; // Ex: 1, 2, 3...
+
     // getters et setters
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
@@ -23,4 +28,12 @@ public class Student {
     public void setMatricule(String matricule) { this.matricule = matricule; }
     public String getEmail() { return email; }
     public void setEmail(String email) { this.email = email; }
+
+    // Getters/Setters Nouveaux Champs
+    public String getFiliere() { return filiere; }
+    public void setFiliere(String filiere) { this.filiere = filiere; }
+    public String getNiveau() { return niveau; }
+    public void setNiveau(String niveau) { this.niveau = niveau; }
+    public Integer getSemestreActuel() { return semestreActuel; }
+    public void setSemestreActuel(Integer semestreActuel) { this.semestreActuel = semestreActuel; }
 }

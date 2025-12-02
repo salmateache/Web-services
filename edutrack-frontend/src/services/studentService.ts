@@ -52,6 +52,17 @@ export const studentService = {
     return true;
   },
 
+  // --- NOUVELLE MÉTHODE : RECHERCHE PAR NOM ---
+  searchStudentsByName: async (nom: string) => {
+    // Appelle l'endpoint que tu as créé dans le backend Java
+    const res = await fetch(`${STUDENT_API_URL}/search?nom=${nom}`, {
+      method: "GET",
+      headers: getAuthHeaders(),
+    });
+    if (!res.ok) throw new Error("Erreur lors de la recherche.");
+    return res.json();
+  },
+
   exportStudentsExcel: async () => {
     const res = await fetch(`${STUDENT_API_URL}/export`, {
       method: "GET",

@@ -1,11 +1,13 @@
 package com.edutrack.student.repository;
 
-import com.edutrack.student.model.Student;
+import java.util.List;
 import org.springframework.data.jpa.repository.JpaRepository;
-import java.util.Optional;
+import com.edutrack.student.model.Student;
 
 public interface StudentRepository extends JpaRepository<Student, Long> {
-
-      // Méthode pour rechercher un étudiant par matricule
-      Optional<Student> findByMatricule(String matricule);
+    
+    // Recherche globale : Nom OU Prénom OU Matricule
+    List<Student> findByNomContainingIgnoreCaseOrPrenomContainingIgnoreCaseOrMatriculeContainingIgnoreCase(
+        String nom, String prenom, String matricule
+    );
 }

@@ -13,8 +13,76 @@ html, body, #root {
 /* ----- Remove Vite template layout ----- */
 body {
   font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
-  background-color: #f5f6fa; /* Clair propre */
+  background-color: #f5f6fa; /* Gris clair propre */
   color: #213547;
 }
 
-/* Suppression des styles qui cassaient le layout */
+/* ----- Table Styles (Pour corriger l'affichage collé) ----- */
+.content-box {
+  background: white;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  margin-top: 20px;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 15px;
+  font-size: 14px;
+}
+
+thead {
+  background-color: #f8f9fa;
+  border-bottom: 2px solid #e9ecef;
+}
+
+th, td {
+  padding: 12px 15px;
+  text-align: left;
+  border-bottom: 1px solid #eee;
+}
+
+th {
+  font-weight: 600;
+  color: #495057;
+  text-transform: uppercase;
+  font-size: 12px;
+  letter-spacing: 0.5px;
+}
+
+tr:hover {
+  background-color: #f8f9fa;
+}
+
+/* Boutons d'action dans le tableau */
+.btn-edit, .btn-delete {
+  padding: 6px 12px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 12px;
+  margin-right: 8px;
+  transition: background 0.2s;
+}
+
+.btn-edit {
+  background-color: #ffc107; /* Jaune */
+  color: #000;
+}
+
+.btn-delete {
+  background-color: #dc3545; /* Rouge */
+  color: white;
+}
+
+.btn-add {
+  background-color: #0d6efd; /* Bleu */
+  color: white;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: bold;
+}
