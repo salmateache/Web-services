@@ -27,10 +27,16 @@ import EditStudent from "./pages/EditStudent";
 import ModuleList from "./components/modules/ModuleList"; 
 import Bulletin from "./components/notes/Bulletin";
 
-// --- PAGES PROFESSEUR (Les imports cruciaux) ---
+// --- PAGES PROFESSEUR ---
 import ProfesseurPage from "./pages/ProfesseurPage";
-import MyModules from "./pages/MyModules";       
-import ModuleNotes from "./pages/ModuleNotes";   
+import MyModules from "./pages/MyModules";         
+import ModuleNotes from "./pages/ModuleNotes";     
+import ProfessorReclamations from "./pages/ProfessorReclamations"; // ✅ IMPORT AJOUTÉ
+
+// --- PAGES ETUDIANT ---
+import StudentModules from "./pages/StudentModules"; 
+import ModuleDetails from "./pages/ModuleDetails";   
+import StudentReclamations from "./pages/StudentReclamations"; 
 
 interface DecodedToken {
   role: string;
@@ -91,7 +97,7 @@ const App: React.FC = () => {
           }
         />
 
-        {/* --- ESPACE ÉTUDIANT --- */}
+        {/* ======================= ESPACE ÉTUDIANT ======================= */}
         <Route
           path="/etudiant"
           element={
@@ -102,8 +108,18 @@ const App: React.FC = () => {
             </ProtectedRoute>
           }
         />
+        
+        {/* Route: Liste des modules de l'étudiant */}
+        <Route path="/etudiant/modules" element={<ProtectedRoute role="ETUDIANT"><DashboardLayout role="ETUDIANT"><StudentModules /></DashboardLayout></ProtectedRoute>} />
+        
+        {/* Route: Détails du module et réclamation */}
+        <Route path="/etudiant/modules/:idModule" element={<ProtectedRoute role="ETUDIANT"><DashboardLayout role="ETUDIANT"><ModuleDetails /></DashboardLayout></ProtectedRoute>} />
+        
+        {/* Route: Liste des réclamations de l'étudiant */}
+        <Route path="/etudiant/reclamations" element={<ProtectedRoute role="ETUDIANT"><DashboardLayout role="ETUDIANT"><StudentReclamations /></DashboardLayout></ProtectedRoute>} />
 
-        {/* --- ESPACE PROFESSEUR --- */}
+
+        {/* ======================= ESPACE PROFESSEUR ======================= */}
         <Route
           path="/professeur"
           element={
@@ -116,30 +132,24 @@ const App: React.FC = () => {
         />
 
         {/* Route: Liste des modules du prof */}
-        <Route 
-          path="/professeur/modules" 
-          element={
-            <ProtectedRoute role="PROFESSEUR">
-              <DashboardLayout role="PROFESSEUR">
-                <MyModules />
-              </DashboardLayout>
-            </ProtectedRoute>
-          } 
-        />
+        <Route path="/professeur/modules" element={<ProtectedRoute role="PROFESSEUR"><DashboardLayout role="PROFESSEUR"><MyModules /></DashboardLayout></ProtectedRoute>} />
 
         {/* Route: Saisie des notes (IdModule dynamique) */}
+        <Route path="/professeur/modules/:idModule/notes" element={<ProtectedRoute role="PROFESSEUR"><DashboardLayout role="PROFESSEUR"><ModuleNotes /></DashboardLayout></ProtectedRoute>} />
+        
+        {/* ✅ ROUTE AJOUTÉE : Gestion des Réclamations par le Professeur */}
         <Route 
-          path="/professeur/modules/:idModule/notes" 
+          path="/professeur/reclamations" 
           element={
             <ProtectedRoute role="PROFESSEUR">
               <DashboardLayout role="PROFESSEUR">
-                <ModuleNotes />
+                <ProfessorReclamations /> 
               </DashboardLayout>
             </ProtectedRoute>
           } 
         />
 
-        {/* --- ESPACE ADMIN --- */}
+        {/* ======================= ESPACE ADMIN ======================= */}
         <Route
           path="/admin"
           element={
@@ -151,16 +161,16 @@ const App: React.FC = () => {
           }
         />
 
-        {/* Admin: Gestion Profs */}
+        {/* Gestion Profs */}
         <Route path="/admin/professors" element={<ProtectedRoute role="ADMINISTRATEUR"><DashboardLayout role="ADMINISTRATEUR"><ProfessorsDashboard /></DashboardLayout></ProtectedRoute>} />
         <Route path="/admin/professors/edit/:id" element={<ProtectedRoute role="ADMINISTRATEUR"><DashboardLayout role="ADMINISTRATEUR"><EditProfessor /></DashboardLayout></ProtectedRoute>} />
         
-        {/* Admin: Gestion Étudiants */}
+        {/* Gestion Étudiants */}
         <Route path="/admin/students" element={<ProtectedRoute role="ADMINISTRATEUR"><DashboardLayout role="ADMINISTRATEUR"><StudentsDashboard /></DashboardLayout></ProtectedRoute>} />
         <Route path="/admin/students/add" element={<ProtectedRoute role="ADMINISTRATEUR"><DashboardLayout role="ADMINISTRATEUR"><AddStudent /></DashboardLayout></ProtectedRoute>} />
         <Route path="/admin/students/edit/:id" element={<ProtectedRoute role="ADMINISTRATEUR"><DashboardLayout role="ADMINISTRATEUR"><EditStudent /></DashboardLayout></ProtectedRoute>} />
 
-        {/* Admin: Gestion Modules & Bulletins */}
+        {/* Gestion Modules & Bulletins */}
         <Route path="/admin/modules" element={<ProtectedRoute role="ADMINISTRATEUR"><DashboardLayout role="ADMINISTRATEUR"><ModuleList /></DashboardLayout></ProtectedRoute>} />
         <Route path="/admin/bulletin" element={<ProtectedRoute role="ADMINISTRATEUR"><DashboardLayout role="ADMINISTRATEUR"><Bulletin /></DashboardLayout></ProtectedRoute>} />
 

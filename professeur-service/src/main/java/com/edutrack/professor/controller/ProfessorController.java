@@ -5,6 +5,7 @@ import com.edutrack.professor.service.ProfesseurService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
+import java.util.NoSuchElementException;
 
 @RestController
 @RequestMapping("/api/professors") 
@@ -46,5 +47,17 @@ public class ProfessorController {
     public ResponseEntity<String> delete(@PathVariable Long id) {
         service.deleteProfesseur(id);
         return ResponseEntity.ok("Professeur supprimé avec succès."); 
+    }
+    @GetMapping("/details/{id}")
+    public ResponseEntity<Professor> getProfessorDetails(@PathVariable Long id) {
+        try {
+            Professor prof = service.getProfesseurById(id);
+            return ResponseEntity.ok(prof);
+            
+        } catch (NoSuchElementException e) {
+            // Si le service lance NoSuchElementException (Professeur non trouvé), 
+            // on retourne un statut 404 NotFound.
+            return ResponseEntity.notFound().build(); 
+        }
     }
 }

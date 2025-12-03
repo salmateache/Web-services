@@ -1,7 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { 
   Users, LayoutDashboard, Menu, Bell,
-  BookOpen, FileText, User, LogOut, ChevronDown
+  BookOpen, FileText, User, LogOut, ChevronDown,
+  MessageSquare
 } from 'lucide-react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { authService } from '../services/authService';
@@ -43,10 +44,13 @@ export default function DashboardLayout({ children, role }: DashboardLayoutProps
         return [
           { icon: LayoutDashboard, label: "Tableau de Bord", route: "/professeur" },
           { icon: BookOpen, label: "Mes Modules & Notes", route: "/professeur/modules" },
+          { icon: FileText, label: "Gérer les Réclamations", route: "/professeur/reclamations" }, // 👈 NOUVEAU
         ];
-      case "ETUDIANT":
+     case "ETUDIANT":
         return [
           { icon: LayoutDashboard, label: "Mon Espace", route: "/etudiant" },
+          { icon: BookOpen, label: "Mes Modules & Notes", route: "/etudiant/modules" },
+          { icon: MessageSquare, label: "Mes Réclamations", route: "/etudiant/reclamations" }, // 👈 NOUVEAU LIEN
         ];
       default:
         return [];
@@ -119,11 +123,6 @@ export default function DashboardLayout({ children, role }: DashboardLayoutProps
           </div>
 
           <div className="flex items-center gap-4">
-            <button className="p-2 text-gray-500 hover:bg-gray-100 rounded-full relative transition">
-              <Bell size={20} />
-              <span className="absolute top-2 right-2 w-2 h-2 bg-red-500 rounded-full animate-pulse"></span>
-            </button>
-
             {/* MENU PROFIL */}
             <div className="relative" ref={menuRef}>
               <button onClick={() => setIsProfileMenuOpen(!isProfileMenuOpen)} className="flex items-center gap-2 focus:outline-none">
